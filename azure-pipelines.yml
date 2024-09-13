@@ -56,4 +56,4 @@ stages:
         azureSubscription: 'Microsoft Partner Network-2(dfbccd65-4e2b-4923-8ad1-2de63fdb2c3a)'
         appType: 'webApp'
         WebAppName: 'Webapp-Calculator-EastUS'
-        packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+        package: '$(System.DefaultWorkingDirectory)/a/drop/**/*.zip'

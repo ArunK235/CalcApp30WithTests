@@ -44,12 +44,12 @@ stages:
   - job: DeployQA
     displayName: 'Deploy to QA'
     steps:
-    - task: DownloadPipelineArtifact@2
+    - task: DownloadBuildArtifacts@1
       inputs:
         buildType: 'current'
+        downloadType: 'single'
         artifactName: 'drop'
-        targetPath: '$(Pipeline.Workspace)'
-
+        downloadPath: '$(System.ArtifactsDirectory)'
     - task: AzureRmWebAppDeployment@4
       inputs:
         ConnectionType: 'AzureRM'

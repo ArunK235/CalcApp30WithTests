@@ -60,3 +60,63 @@ stages:
         ResourceGroupName: 'RG-Pipelines-EastUS'
         SlotName: 'qa'
         packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+
+# Test Stage
+- stage: Test
+  displayName: 'Test Stage'
+  dependsOn: QA
+  jobs:
+  - job: DeployTest
+    displayName: 'Deploy to Test'
+    steps:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.DefaultWorkingDirectory)/a/drop'
+
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: 'Microsoft Partner Network-2(dfbccd65-4e2b-4923-8ad1-2de63fdb2c3a)'
+        appType: 'webApp'
+        WebAppName: 'Webapp-Calculator-EastUS'
+        deployToSlotOrASE: true
+        ResourceGroupName: 'RG-Pipelines-EastUS'
+        SlotName: 'test'
+        packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+
+# Prod Stage with Approval
+- stage: Prod
+  displayName: 'Production Stage'
+  dependsOn: Test
+  jobs:
+  - deployment: DeployProd
+    displayName: 'Deploy to Production'
+    environment: 'Production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@1
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.DefaultWorkingDirectory)/a/drop'
+
+          - task: AzureRmWebAppDeployment@4
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: 'Microsoft Partner Network-2(dfbccd65-4e2b-4923-8ad1-2de63fdb2c3a)'
+              appType: 'webApp'
+              WebAppName: 'Webapp-Calculator-EastUS'
+              deployToSlotOrASE: true
+              ResourceGroupName: 'RG-Pipelines-EastUS'
+              SlotName: 'production'
+              packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+
+
+
+  
